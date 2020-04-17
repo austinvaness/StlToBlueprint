@@ -70,6 +70,7 @@ namespace Stl2Blueprint
         CancellationTokenSource tokenSource;
         Mesh m;
         Counter blockCount = new Counter();
+        string output;
 
         public Main ()
         {
@@ -81,9 +82,14 @@ namespace Stl2Blueprint
             lblFile.Text = "";
             lblTris.Text = "";
             lblBlockCount.Text = "";
-            folderDialog.SelectedPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)
+            output = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+            string se = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)
                 + "\\SpaceEngineers\\Blueprints\\local";
-            lblOutput.Text = folderDialog.SelectedPath;
+            if(Directory.Exists(se))
+                output = se;
+            folderDialog.SelectedPath = output;
+            lblOutput.Text = output;
+
         }
 
         // Keen: MyColorPickerConstants.cs
@@ -206,9 +212,9 @@ namespace Stl2Blueprint
                 blockCount.Value++;
         }
 
-        private void OnFileOpened (object sender, CancelEventArgs e)
+        private void OnOpenFileClicked (object sender, EventArgs e)
         {
-            if (!e.Cancel)
+            if(fileDialog.ShowDialog() == DialogResult.OK)
             {
                 lblFile.Text = fileDialog.SafeFileName;
                 txtBlueprintName.ForeColor = Color.Black;
@@ -224,20 +230,13 @@ namespace Stl2Blueprint
             }
         }
 
-        private void OnOpenFileClicked (object sender, EventArgs e)
-        {
-            fileDialog.ShowDialog();
-        }
-
-        private void OnFolderOpened (object sender, CancelEventArgs e)
-        {
-            if (!e.Cancel)
-                lblOutput.Text = folderDialog.SelectedPath;
-        }
-
         private void OnOpenFolderClicked (object sender, EventArgs e)
         {
-            folderDialog.ShowDialog();
+            if (folderDialog.ShowDialog() == DialogResult.OK)
+            {
+                output = folderDialog.SelectedPath;
+                lblOutput.Text = output;
+            }
         }
 
         private async void OnStartClicked (object sender, EventArgs e)

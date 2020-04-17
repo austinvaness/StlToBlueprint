@@ -65,7 +65,6 @@
             // fileDialog
             // 
             this.fileDialog.Filter = "Model (*.stl)|*.stl";
-            this.fileDialog.FileOk += new System.ComponentModel.CancelEventHandler(this.OnFileOpened);
             // 
             // progressBar
             // 
