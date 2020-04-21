@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
@@ -10,6 +12,13 @@ namespace Stl2Blueprint
     public struct Vector3
     {
         public float x, y, z;
+
+        public Vector3(float xyz)
+        {
+            x = xyz;
+            y = xyz;
+            z = xyz;
+        }
 
         public Vector3(float x, float y, float z)
         {
@@ -25,13 +34,11 @@ namespace Stl2Blueprint
 
         public Vector3 Cross(Vector3 other)
         {
-            Vector3 result = new Vector3
-            {
-                x = y * other.z - z * other.y,
-                y = z * other.x - x * other.z,
-                z = x * other.y - y * other.x
-            };
-            return result;
+            return new Vector3(
+                y * other.z - z * other.y,
+                z * other.x - x * other.z,
+                x * other.y - y * other.x
+            );
         }
 
         public static Vector3 Normalize (Vector3 v)
@@ -46,56 +53,37 @@ namespace Stl2Blueprint
 
         public static Vector3 operator + (Vector3 v, float n)
         {
-            Vector3 result = new Vector3();
-            result.x = v.x + n;
-            result.y = v.y + n;
-            result.z = v.z + n;
-            return result;
+            return new Vector3(v.x + n, v.y + n, v.z + n);
         }
 
         public static Vector3 operator - (Vector3 v, float n)
         {
-            Vector3 result = new Vector3();
-            result.x = v.x - n;
-            result.y = v.y - n;
-            result.z = v.z - n;
-            return result;
+            return new Vector3(v.x - n, v.y - n, v.z - n);
         }
 
         public static Vector3 operator * (Vector3 v, float n)
         {
-            Vector3 result = new Vector3();
-            result.x = v.x * n;
-            result.y = v.y * n;
-            result.z = v.z * n;
-            return result;
+            return new Vector3(v.x * n, v.y * n, v.z * n);
+        }
+
+        public static Vector3 operator - (Vector3 v)
+        {
+            return new Vector3(-v.x, v.y, v.z);
         }
 
         public static Vector3 operator / (Vector3 v, float n)
         {
-            Vector3 result = new Vector3();
-            result.x = v.x / n;
-            result.y = v.y / n;
-            result.z = v.z / n;
-            return result;
+            return new Vector3(v.x / n, v.y / n, v.z / n);
         }
 
         public static Vector3 operator - (Vector3 v1, Vector3 v2)
         {
-            Vector3 result = new Vector3();
-            result.x = v1.x - v2.x;
-            result.y = v1.y - v2.y;
-            result.z = v1.z - v2.z;
-            return result;
+            return new Vector3(v1.x - v2.x, v1.y - v2.y, v1.z - v2.z);
         }
 
         public static Vector3 operator + (Vector3 v1, Vector3 v2)
         {
-            Vector3 result = new Vector3();
-            result.x = v1.x + v2.x;
-            result.y = v1.y + v2.y;
-            result.z = v1.z + v2.z;
-            return result;
+            return new Vector3(v1.x + v2.x, v1.y + v2.y, v1.z + v2.z);
         }
 
         public static bool operator ==(Vector3 v1, Vector3 v2)
@@ -108,9 +96,22 @@ namespace Stl2Blueprint
             return v1.x != v2.x || v1.y != v2.y || v1.z != v2.z;
         }
 
-        public static Vector3 Parse(string[] values, int start)
+        public static bool TryParse(string[] values, int start, out Vector3 v)
         {
-            return new Vector3(float.Parse(values [start]), float.Parse(values [start + 1]), float.Parse(values [start + 2]));
+            v = new Vector3();
+            if(start + 2 >= values.Length)
+                return false;
+            if (!TryParse(values [start], out float x) || !TryParse(values [start + 1], out float y) || !TryParse(values [start + 2], out float z))
+                return false;
+            v.x = x;
+            v.y = y;
+            v.z = z;
+            return true;
+        }
+
+        private static bool TryParse(string s, out float n)
+        {
+            return float.TryParse(s, NumberStyles.Any, CultureInfo.InvariantCulture, out n);
         }
 
         public override bool Equals (object obj)
@@ -130,14 +131,14 @@ namespace Stl2Blueprint
             return hashCode;
         }
 
-        public static Vector3 Round(Vector3 v)
+        public static Vector3I Round(Vector3 v)
         {
-            return new Vector3((float)Math.Round(v.x), (float)Math.Round(v.y), (float)Math.Round(v.z));
+            return new Vector3I((int)Math.Round(v.x), (int)Math.Round(v.y), (int)Math.Round(v.z));
         }
 
-        public static Vector3 Floor(Vector3 v)
+        public static Vector3I Floor(Vector3 v)
         {
-            return new Vector3((int)v.x, (int)v.y, (int)v.z);
+            return new Vector3I((int)v.x, (int)v.y, (int)v.z);
         }
 
         public static float ScalerProjection(Vector3 v, Vector3 guide)
@@ -145,9 +146,49 @@ namespace Stl2Blueprint
             return v.Dot(guide);
         }
 
+        public Vector3 Abs()
+        {
+            return new Vector3(Math.Abs(x), Math.Abs(y), Math.Abs(z));
+        }
+
         public float Min()
         {
             return Math.Min(Math.Min(x, y), z);
+        }
+
+        public static Vector3 Min(params Vector3[] vectors)
+        {
+            Vector3 min = new Vector3(float.MaxValue);
+            foreach(Vector3 v in vectors)
+            {
+                if (v.x < min.x)
+                    min.x = v.x;
+                if (v.y < min.y)
+                    min.y = v.y;
+                if (v.z < min.z)
+                    min.z = v.z;
+            }
+            return min;
+        }
+
+        public static Vector3 Max(params Vector3[] vectors)
+        {
+            Vector3 max = new Vector3(float.MinValue);
+            foreach (Vector3 v in vectors)
+            {
+                if (v.x > max.x)
+                    max.x = v.x;
+                if (v.y > max.y)
+                    max.y = v.y;
+                if (v.z > max.z)
+                    max.z = v.z;
+            }
+            return max;
+        }
+
+        public float Max()
+        {
+            return Math.Max(Math.Max(x, y), z);
         }
 
         public override string ToString ()
@@ -158,5 +199,11 @@ namespace Stl2Blueprint
             sb.Append(z);
             return sb.ToString();
         }
+
+        public static Vector3 Zero = new Vector3();
+        public static Vector3 AxisX = new Vector3(1, 0, 0);
+        public static Vector3 AxisY = new Vector3(0, 1, 0);
+        public static Vector3 AxisZ = new Vector3(0, 0, 1);
+
     }
 }

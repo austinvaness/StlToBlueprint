@@ -46,6 +46,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ArmorCube.cs" />
+    <Compile Include="BitArray.cs" />
+    <Compile Include="BoundingBox.cs" />
     <Compile Include="Line.cs" />
     <Compile Include="Main.cs">
       <SubType>Form</SubType>
@@ -53,11 +56,13 @@
     <Compile Include="Main.Designer.cs">
       <DependentUpon>Main.cs</DependentUpon>
     </Compile>
+    <Compile Include="Matrix.cs" />
     <Compile Include="Mesh.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Triangle.cs" />
     <Compile Include="Vector3.cs" />
+    <Compile Include="Vector3I.cs" />
     <EmbeddedResource Include="Main.resx">
       <DependentUpon>Main.cs</DependentUpon>
     </EmbeddedResource>

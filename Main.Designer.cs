@@ -42,7 +42,7 @@
             this.txtSizeY = new System.Windows.Forms.TextBox();
             this.txtSizeZ = new System.Windows.Forms.TextBox();
             this.lblSize = new System.Windows.Forms.Label();
-            this.lblBlockCount = new System.Windows.Forms.Label();
+            this.lblInfo = new System.Windows.Forms.Label();
             this.txtResolution = new System.Windows.Forms.TextBox();
             this.lblResolution = new System.Windows.Forms.Label();
             this.colorDialog = new System.Windows.Forms.ColorDialog();
@@ -50,6 +50,14 @@
             this.lblColor = new System.Windows.Forms.Label();
             this.saveFileDialog1 = new System.Windows.Forms.SaveFileDialog();
             this.lblName = new System.Windows.Forms.Label();
+            this.comboType = new System.Windows.Forms.ComboBox();
+            this.lblType = new System.Windows.Forms.Label();
+            this.comboSkin = new System.Windows.Forms.ComboBox();
+            this.lblSkin = new System.Windows.Forms.Label();
+            this.background = new System.ComponentModel.BackgroundWorker();
+            this.chkHollow = new System.Windows.Forms.CheckBox();
+            this.chkSlopes = new System.Windows.Forms.CheckBox();
+            this.lblSizeMeters = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // btnOpenFile
@@ -166,18 +174,18 @@
             this.lblSize.AutoSize = true;
             this.lblSize.Location = new System.Drawing.Point(27, 145);
             this.lblSize.Name = "lblSize";
-            this.lblSize.Size = new System.Drawing.Size(27, 13);
+            this.lblSize.Size = new System.Drawing.Size(57, 13);
             this.lblSize.TabIndex = 15;
-            this.lblSize.Text = "Size";
+            this.lblSize.Text = "Block Size";
             // 
-            // lblBlockCount
+            // lblInfo
             // 
-            this.lblBlockCount.AutoSize = true;
-            this.lblBlockCount.Location = new System.Drawing.Point(94, 395);
-            this.lblBlockCount.Name = "lblBlockCount";
-            this.lblBlockCount.Size = new System.Drawing.Size(51, 13);
-            this.lblBlockCount.TabIndex = 16;
-            this.lblBlockCount.Text = "Blocks: 0";
+            this.lblInfo.AutoSize = true;
+            this.lblInfo.Location = new System.Drawing.Point(94, 395);
+            this.lblInfo.Name = "lblInfo";
+            this.lblInfo.Size = new System.Drawing.Size(51, 13);
+            this.lblInfo.TabIndex = 16;
+            this.lblInfo.Text = "Blocks: 0";
             // 
             // txtResolution
             // 
@@ -217,7 +225,7 @@
             // lblColor
             // 
             this.lblColor.AutoSize = true;
-            this.lblColor.Location = new System.Drawing.Point(27, 258);
+            this.lblColor.Location = new System.Drawing.Point(27, 254);
             this.lblColor.Name = "lblColor";
             this.lblColor.Size = new System.Drawing.Size(31, 13);
             this.lblColor.TabIndex = 20;
@@ -232,17 +240,118 @@
             this.lblName.TabIndex = 21;
             this.lblName.Text = "Name";
             // 
+            // comboType
+            // 
+            this.comboType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboType.FormattingEnabled = true;
+            this.comboType.Items.AddRange(new object[] {
+            "Large",
+            "Small"});
+            this.comboType.Location = new System.Drawing.Point(27, 328);
+            this.comboType.Name = "comboType";
+            this.comboType.Size = new System.Drawing.Size(121, 21);
+            this.comboType.TabIndex = 22;
+            this.comboType.SelectedIndexChanged += new System.EventHandler(this.OnCubeSizeChanged);
+            // 
+            // lblType
+            // 
+            this.lblType.AutoSize = true;
+            this.lblType.Location = new System.Drawing.Point(27, 312);
+            this.lblType.Name = "lblType";
+            this.lblType.Size = new System.Drawing.Size(31, 13);
+            this.lblType.TabIndex = 23;
+            this.lblType.Text = "Type";
+            // 
+            // comboSkin
+            // 
+            this.comboSkin.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboSkin.FormattingEnabled = true;
+            this.comboSkin.Items.AddRange(new object[] {
+            "Default",
+            "DigitalCamouflage",
+            "CarbonFibre",
+            "Clean",
+            "Golden",
+            "Silver",
+            "Glamour",
+            "Disco",
+            "Wood",
+            "Mossy",
+            "Battered",
+            "CowMooFlage",
+            "RustNonColorable",
+            "Rusty",
+            "Frozen"});
+            this.comboSkin.Location = new System.Drawing.Point(162, 328);
+            this.comboSkin.Name = "comboSkin";
+            this.comboSkin.Size = new System.Drawing.Size(121, 21);
+            this.comboSkin.TabIndex = 24;
+            this.comboSkin.SelectedIndexChanged += new System.EventHandler(this.OnSkinTypeChanged);
+            // 
+            // lblSkin
+            // 
+            this.lblSkin.AutoSize = true;
+            this.lblSkin.Location = new System.Drawing.Point(162, 311);
+            this.lblSkin.Name = "lblSkin";
+            this.lblSkin.Size = new System.Drawing.Size(28, 13);
+            this.lblSkin.TabIndex = 25;
+            this.lblSkin.Text = "Skin";
+            // 
+            // background
+            // 
+            this.background.WorkerReportsProgress = true;
+            this.background.WorkerSupportsCancellation = true;
+            // 
+            // chkHollow
+            // 
+            this.chkHollow.AutoSize = true;
+            this.chkHollow.Checked = true;
+            this.chkHollow.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chkHollow.Location = new System.Drawing.Point(15, 367);
+            this.chkHollow.Name = "chkHollow";
+            this.chkHollow.Size = new System.Drawing.Size(58, 17);
+            this.chkHollow.TabIndex = 26;
+            this.chkHollow.Text = "Hollow";
+            this.chkHollow.UseVisualStyleBackColor = true;
+            this.chkHollow.CheckedChanged += new System.EventHandler(this.OnHollowChanged);
+            // 
+            // chkSlopes
+            // 
+            this.chkSlopes.AutoSize = true;
+            this.chkSlopes.Location = new System.Drawing.Point(80, 367);
+            this.chkSlopes.Name = "chkSlopes";
+            this.chkSlopes.Size = new System.Drawing.Size(58, 17);
+            this.chkSlopes.TabIndex = 27;
+            this.chkSlopes.Text = "Slopes";
+            this.chkSlopes.UseVisualStyleBackColor = true;
+            this.chkSlopes.CheckedChanged += new System.EventHandler(this.OnUseSlopesChanged);
+            // 
+            // lblSizeMeters
+            // 
+            this.lblSizeMeters.AutoSize = true;
+            this.lblSizeMeters.Location = new System.Drawing.Point(162, 188);
+            this.lblSizeMeters.Name = "lblSizeMeters";
+            this.lblSizeMeters.Size = new System.Drawing.Size(0, 13);
+            this.lblSizeMeters.TabIndex = 29;
+            // 
             // Main
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.lblSizeMeters);
+            this.Controls.Add(this.chkSlopes);
+            this.Controls.Add(this.chkHollow);
+            this.Controls.Add(this.lblSkin);
+            this.Controls.Add(this.comboSkin);
+            this.Controls.Add(this.lblType);
+            this.Controls.Add(this.comboType);
             this.Controls.Add(this.lblName);
             this.Controls.Add(this.lblColor);
             this.Controls.Add(this.btnColor);
             this.Controls.Add(this.lblResolution);
             this.Controls.Add(this.txtResolution);
-            this.Controls.Add(this.lblBlockCount);
+            this.Controls.Add(this.lblInfo);
             this.Controls.Add(this.lblSize);
             this.Controls.Add(this.txtSizeZ);
             this.Controls.Add(this.txtSizeY);
@@ -280,7 +389,7 @@
         private System.Windows.Forms.TextBox txtSizeY;
         private System.Windows.Forms.TextBox txtSizeZ;
         private System.Windows.Forms.Label lblSize;
-        private System.Windows.Forms.Label lblBlockCount;
+        private System.Windows.Forms.Label lblInfo;
         private System.Windows.Forms.TextBox txtResolution;
         private System.Windows.Forms.Label lblResolution;
         private System.Windows.Forms.ColorDialog colorDialog;
@@ -288,6 +397,14 @@
         private System.Windows.Forms.Label lblColor;
         private System.Windows.Forms.SaveFileDialog saveFileDialog1;
         private System.Windows.Forms.Label lblName;
+        private System.Windows.Forms.ComboBox comboType;
+        private System.Windows.Forms.Label lblType;
+        private System.Windows.Forms.ComboBox comboSkin;
+        private System.Windows.Forms.Label lblSkin;
+        private System.ComponentModel.BackgroundWorker background;
+        private System.Windows.Forms.CheckBox chkHollow;
+        private System.Windows.Forms.CheckBox chkSlopes;
+        private System.Windows.Forms.Label lblSizeMeters;
     }
 }
 

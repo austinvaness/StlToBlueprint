@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace Stl2Blueprint
 {
@@ -13,21 +14,15 @@ namespace Stl2Blueprint
         public Triangle[] Triangles { get; }
         public Line [] Edges { get; }
         public Vector3[] Verticies { get; }
-        public Vector3 Center { get; }
-        public Vector3 Size { get; }
-        public Vector3 Min { get; }
-        public Vector3 Max { get; }
+        public BoundingBox Bounds { get; }
 
         public Mesh(IEnumerable<Triangle> triangles, IEnumerable<Line> edges, IEnumerable<Vector3> verticies,
-            Vector3 center, Vector3 size, Vector3 min, Vector3 max)
+            Vector3 min, Vector3 max)
         {
             Triangles = triangles.ToArray();
             Edges = edges.ToArray();
             Verticies = verticies.ToArray();
-            Center = center;
-            Size = size;
-            Min = min;
-            Max = max;
+            Bounds = new BoundingBox(min, max);
         }
 
         public static Mesh ParseStl(string fileName)
@@ -42,20 +37,29 @@ namespace Stl2Blueprint
             
             ASCIIEncoding ascii = new ASCIIEncoding();
             string header = ascii.GetString(br.ReadBytes(80));
-            if(header.StartsWith("solid"))
+            int errors = 0;
+            if (header.StartsWith("solid"))
             {
                 br.Close();
                 StreamReader sr = new StreamReader(File.OpenRead(fileName), ascii);
-                while(Triangle.Read(sr, out Triangle t))
+                while (Triangle.ReadFindAscii(sr, out string triangleLine))
                 {
-                    MinMax(ref min, ref max, ref t);
-                    triangles.Add(t);
-                    edges.Add(t.edge12);
-                    edges.Add(t.edge13);
-                    edges.Add(t.edge23);
-                    verticies.Add(t.vertex1);
-                    verticies.Add(t.vertex2);
-                    verticies.Add(t.vertex3);
+                    if (Triangle.ReadAscii(sr, triangleLine, out Triangle t))
+                    {
+                        min = Vector3.Min(min, t.aabb.min);
+                        max = Vector3.Max(max, t.aabb.max);
+                        triangles.Add(t);
+                        edges.Add(t.edge12);
+                        edges.Add(t.edge31);
+                        edges.Add(t.edge23);
+                        verticies.Add(t.vertex1);
+                        verticies.Add(t.vertex2);
+                        verticies.Add(t.vertex3);
+                    }
+                    else
+                    {
+                        errors++;
+                    }
                 }
                 sr.Close();
             }
@@ -64,76 +68,51 @@ namespace Stl2Blueprint
                 uint count = br.ReadUInt32();
                 for (uint i = 0; i < count; i++)
                 {
-                    Triangle t = Triangle.Read(br);
-                    MinMax(ref min, ref max, ref t);
-                    triangles.Add(t);
-                    edges.Add(t.edge12);
-                    edges.Add(t.edge13);
-                    edges.Add(t.edge23);
-                    verticies.Add(t.vertex1);
-                    verticies.Add(t.vertex2);
-                    verticies.Add(t.vertex3);
+                    if(Triangle.ReadBinary(br, out Triangle t))
+                    {
+                        min = Vector3.Min(min, t.aabb.min);
+                        max = Vector3.Max(max, t.aabb.max);
+                        triangles.Add(t);
+                        edges.Add(t.edge12);
+                        edges.Add(t.edge31);
+                        edges.Add(t.edge23);
+                        verticies.Add(t.vertex1);
+                        verticies.Add(t.vertex2);
+                        verticies.Add(t.vertex3);
+                    }
+                    else
+                    {
+                        errors++;
+                    }
                 }
                 br.Close();
             }
+            if (errors > 0)
+                MessageBox.Show(errors + " invalid triangles were ignored in the stl file.");
 
-            Vector3 size = max - min;
-            Vector3 center = (size / 2) + min;
-            return new Mesh(triangles, edges, verticies, center, size, min, max);
-        }
-
-        private static void MinMax(ref Vector3 min, ref Vector3 max, ref Triangle t)
-        {
-            if (t.vertex1.x > max.x)
-                max.x = t.vertex1.x;
-            else if (t.vertex1.x < min.x)
-                min.x = t.vertex1.x;
-            if (t.vertex1.y > max.y)
-                max.y = t.vertex1.y;
-            else if (t.vertex1.y < min.y)
-                min.y = t.vertex1.y;
-            if (t.vertex1.z > max.z)
-                max.z = t.vertex1.z;
-            else if (t.vertex1.z < min.z)
-                min.z = t.vertex1.z;
-
-            if (t.vertex2.x > max.x)
-                max.x = t.vertex2.x;
-            else if (t.vertex2.x < min.x)
-                min.x = t.vertex2.x;
-            if (t.vertex2.y > max.y)
-                max.y = t.vertex2.y;
-            else if (t.vertex2.y < min.y)
-                min.y = t.vertex2.y;
-            if (t.vertex2.z > max.z)
-                max.z = t.vertex2.z;
-            else if (t.vertex2.z < min.z)
-                min.z = t.vertex2.z;
-
-            if (t.vertex3.x > max.x)
-                max.x = t.vertex3.x;
-            else if (t.vertex3.x < min.x)
-                min.x = t.vertex3.x;
-            if (t.vertex3.y > max.y)
-                max.y = t.vertex3.y;
-            else if (t.vertex3.y < min.y)
-                min.y = t.vertex3.y;
-            if (t.vertex3.z > max.z)
-                max.z = t.vertex3.z;
-            else if (t.vertex3.z < min.z)
-                min.z = t.vertex3.z;
+            return new Mesh(triangles, edges, verticies, min, max);
         }
 
         public bool ContainsPoint (Vector3 p)
         {
-            Vector3 dir = Vector3.Normalize(p - Center);
             int count = 0;
+            //Vector3 ray = Center - p;
             for(int i = 0; i < Triangles.Length; i++)
             {
-                if (Triangles[i].IntersectsRay(p, dir))
+                if (Triangles[i].IntersectsPoint(p))
                     count++;
             }
             return count % 2 == 1;
+        }
+
+        public bool ContainsBox(BoundingBox box)
+        {
+            foreach(Triangle t in Triangles)
+            {
+                if (t.IntersectsBox(box))
+                    return true;
+            }
+            return false;
         }
     }
 }

@@ -7,18 +7,19 @@ namespace Stl2Blueprint
         public readonly Vector3 Start;
         public readonly Vector3 End;
         public readonly float Len;
+        public readonly Vector3 Vector;
         public readonly Vector3 Dir;
 
         public Line (Vector3 start, Vector3 end)
         {
             Start = start;
             End = end;
-            Vector3 diff = end - start;
-            Len = diff.Length();
+            Vector = end - start;
+            Len = Vector.Length();
             if (Len == 0)
                 Dir = new Vector3();
             else
-                Dir = diff / Len;
+                Dir = Vector / Len;
 
         }
 
