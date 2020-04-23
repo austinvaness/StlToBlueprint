@@ -38,6 +38,7 @@ namespace Stl2Blueprint
             ASCIIEncoding ascii = new ASCIIEncoding();
             string header = ascii.GetString(br.ReadBytes(80));
             int errors = 0;
+            int total = 0;
             if (header.StartsWith("solid"))
             {
                 br.Close();
@@ -60,12 +61,14 @@ namespace Stl2Blueprint
                     {
                         errors++;
                     }
+                    total++;
                 }
                 sr.Close();
             }
             else
             {
                 uint count = br.ReadUInt32();
+                total = (int)count;
                 for (uint i = 0; i < count; i++)
                 {
                     if(Triangle.ReadBinary(br, out Triangle t))
@@ -87,7 +90,7 @@ namespace Stl2Blueprint
                 }
                 br.Close();
             }
-            if (errors > 0)
+            if (errors / (float)total > GlobalConstants.meshErrorThreshold)
                 MessageBox.Show(errors + " invalid triangles were ignored in the stl file.");
 
             return new Mesh(triangles, edges, verticies, min, max);
@@ -96,7 +99,6 @@ namespace Stl2Blueprint
         public bool ContainsPoint (Vector3 p)
         {
             int count = 0;
-            //Vector3 ray = Center - p;
             for(int i = 0; i < Triangles.Length; i++)
             {
                 if (Triangles[i].IntersectsPoint(p))
@@ -105,7 +107,7 @@ namespace Stl2Blueprint
             return count % 2 == 1;
         }
 
-        public bool ContainsBox(BoundingBox box)
+        public bool IntersectsBox(BoundingBox box)
         {
             foreach(Triangle t in Triangles)
             {

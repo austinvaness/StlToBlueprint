@@ -63,6 +63,7 @@ namespace Stl2Blueprint
         private string output;
         private bool hollow;
         private bool slopes;
+        private bool lessAccuracy;
         private readonly Random rand = new Random();
 
         public Main ()
@@ -90,6 +91,7 @@ namespace Stl2Blueprint
             background.ProgressChanged += During;
             hollow = chkHollow.Checked;
             slopes = chkSlopes.Checked;
+            lessAccuracy = chkAccuracy.Checked;
         }
 
         void Process (Mesh m, float c, bool hollow, bool slopes, BackgroundWorker worker, DoWorkEventArgs e)
@@ -116,7 +118,7 @@ namespace Stl2Blueprint
                     return;
                 }
                 float percent = Math.Min(x / (float)size.x, 1);
-                worker.ReportProgress((int)(percent * 70), $"Building point cloud... {(int)(percent * 100)}% - Points: {grid.Count}");
+                worker.ReportProgress((int)(percent * GlobalConstants.processSplit), $"Building point cloud... {(int)(percent * 100)}% - Points: {grid.Count}");
                 int y = 0;
                 for (p.y = min.y; p.y < max.y; p.y += c)
                 {
@@ -126,7 +128,6 @@ namespace Stl2Blueprint
                     Parallel.For(0, size.z, (i) => {
                         if (m.ContainsPoint(new Vector3(p.x, p.y, minZ + (c * i))))
                             WriteCube(grid, x, y, i);
-                            //Write(cube.Replace("{x}", x.ToString()).Replace("{y}", y.ToString()).Replace("{z}", i.ToString()));
                     });
                     y++;
                 }
@@ -134,7 +135,7 @@ namespace Stl2Blueprint
             }
 
             blockCount.Value = 0;
-            worker.ReportProgress(70, "Processing points... 0% - Blocks: 0");
+            worker.ReportProgress(GlobalConstants.processSplit, "Processing points... 0% - Blocks: 0");
 
             string name = GetName();
             byte [] randId = new byte [8];
@@ -148,7 +149,8 @@ namespace Stl2Blueprint
             text = File.CreateText(tempFile);
             text.Write(header);
 
-            for (x = 0; x < size.x; x++)
+            Vector3I gridPos = new Vector3I();
+            for (; gridPos.x < size.x; gridPos.x++)
             {
                 if (worker.CancellationPending)
                 {
@@ -157,14 +159,14 @@ namespace Stl2Blueprint
                     File.Delete(tempFile);
                     return;
                 }
-                float percent = x / (float)size.x;
-                worker.ReportProgress(70 + (int)(percent * 30), $"Processing points... {(int)(percent * 100)}% - Blocks: {blockCount.Value}");
-                for (int y = 0; y < size.y; y++)
+                float percent = gridPos.x / (float)size.x;
+                worker.ReportProgress(GlobalConstants.processSplit + (int)(percent * (100 - GlobalConstants.processSplit)), $"Processing points... {(int)(percent * 100)}% - Blocks: {blockCount.Value}");
+                for (gridPos.y = 0; gridPos.y < size.y; gridPos.y++)
                 {
                     if (worker.CancellationPending)
                         break;
                     Parallel.For(0, size.z, (i) => {
-                        Write(grid, x, y, i, hollow, slopes, c, m);
+                        Write(grid, gridPos, i, c, hollow, slopes, m);
                     });
                 }
             }
@@ -190,41 +192,56 @@ namespace Stl2Blueprint
                 array [i] = true;
         }
 
-        private void Write (BitArray grid, int x, int y, int z, bool hollow, bool slopes, float c, Mesh m)
+        private void Write (BitArray grid, Vector3I gridPos, int z, float c, bool hollow, bool slopes, Mesh m)
         {
-            bool xSafe = x < grid.Length(0) - 1;
-            bool ySafe = y < grid.Length(1) - 1;
-            bool zSafe = z < grid.Length(2) - 1;
+            gridPos.z = z;
+            if (CheckSlopes(gridPos, c,hollow, slopes, grid, out ArmorCube cube))
+            {
+                string s = cube.ToString();
+                lock (text)
+                    text.Write(s);
+                lock (blockCount)
+                    blockCount.Value++;
+            }
+        }
 
-            bool b11 = grid [x, y, z];
+        private bool CheckSlopes(Vector3I gridPos, float c, bool hollow, bool slopes, BitArray grid, out ArmorCube cube)
+        {
+            cube = null;
+
+            bool xSafe = gridPos.x < grid.Length(0) - 1;
+            bool ySafe = gridPos.y < grid.Length(1) - 1;
+            bool zSafe = gridPos.z < grid.Length(2) - 1;
+
+            bool b11 = grid [gridPos.x, gridPos.y, gridPos.z];
 
             bool b21 = false;
             if (ySafe)
-                b21 = grid [x, y + 1, z];
+                b21 = grid [gridPos.x, gridPos.y + 1, gridPos.z];
 
             bool b31 = false;
             if (xSafe)
-                b31 = grid [x + 1, y, z];
+                b31 = grid [gridPos.x + 1, gridPos.y, gridPos.z];
 
             bool b41 = false;
-            if(xSafe && ySafe)
-                b41 = grid [x + 1, y + 1, z];
+            if (xSafe && ySafe)
+                b41 = grid [gridPos.x + 1, gridPos.y + 1, gridPos.z];
 
             bool b12 = false;
-            if(zSafe)
-                b12 = grid [x, y, z + 1];
+            if (zSafe)
+                b12 = grid [gridPos.x, gridPos.y, gridPos.z + 1];
 
             bool b22 = false;
-            if(ySafe && zSafe)
-                b22 = grid [x, y + 1, z + 1];
+            if (ySafe && zSafe)
+                b22 = grid [gridPos.x, gridPos.y + 1, gridPos.z + 1];
 
             bool b32 = false;
-            if(xSafe && zSafe)
-                b32 = grid [x + 1, y, z + 1];
+            if (xSafe && zSafe)
+                b32 = grid [gridPos.x + 1, gridPos.y, gridPos.z + 1];
 
             bool b42 = false;
-            if(xSafe && ySafe && zSafe)
-                b42 = grid [x + 1, y + 1, z + 1];
+            if (xSafe && ySafe && zSafe)
+                b42 = grid [gridPos.x + 1, gridPos.y + 1, gridPos.z + 1];
 
             byte count = 0;
             if (b11)
@@ -243,22 +260,20 @@ namespace Stl2Blueprint
                 count++;
             if (b42)
                 count++;
-
-            Vector3I gridPos = new Vector3I(x, y, z);
             if (count > 0)
             {
                 if (count == 8 && hollow)
-                    return;
+                    return false;
             }
             else
             {
                 Vector3 realPos = (gridPos * c) + m.Bounds.min;
-                if (!m.ContainsBox(new BoundingBox(realPos, realPos + c)))
-                    return;
+                if (!lessAccuracy && !m.IntersectsBox(new BoundingBox(realPos, realPos + c)))
+                    return false;
                 count = 8;
             }
 
-            ArmorCube cube = new ArmorCube(this.cube, gridPos);
+            cube = new ArmorCube(this.cube, gridPos);
             if (slopes)
             {
                 if (count == 1)
@@ -373,6 +388,54 @@ namespace Stl2Blueprint
                         cube.BlockType = ArmorCube.Type.Block;
                     }
                 }
+                else if (count == 3)
+                {
+                    cube.BlockType = ArmorCube.Type.InvCorner;
+                    if (b21 && b22 && (b11 || b41))
+                    {
+                        cube.BlockForward = ArmorCube.Direction.Right;
+                        //cube.BlockUp = ArmorCube.Direction.Up;
+                    }
+                    else if (b41 && b42 && (b31 || b21))
+                    {
+                        cube.BlockForward = ArmorCube.Direction.Backward;
+                        //cube.BlockUp = ArmorCube.Direction.Up;
+                    }
+                    else if (b31 && b32 && (b41 || b11))
+                    {
+                        cube.BlockForward = ArmorCube.Direction.Left;
+                        cube.BlockUp = ArmorCube.Direction.Down;
+                    }
+                    else if (b11 && b12 && (b31 || b21))
+                    {
+                        cube.BlockForward = ArmorCube.Direction.Backward;
+                        cube.BlockUp = ArmorCube.Direction.Down;
+                    }
+                    else if (b22 && b21 && (b12 || b42))
+                    {
+                        //cube.BlockForward = ArmorCube.Direction.Forward;
+                        //cube.BlockUp = ArmorCube.Direction.Up;
+                    }
+                    else if (b42 && b41 && (b22 || b32))
+                    {
+                        cube.BlockForward = ArmorCube.Direction.Left;
+                        //cube.BlockUp = ArmorCube.Direction.Up;
+                    }
+                    else if (b32 && b31 && (b42 || b12))
+                    {
+                        //cube.BlockForward = ArmorCube.Direction.Forward;
+                        cube.BlockUp = ArmorCube.Direction.Down;
+                    }
+                    else if (b12 && b11 && (b32 || b22))
+                    {
+                        cube.BlockForward = ArmorCube.Direction.Right;
+                        cube.BlockUp = ArmorCube.Direction.Down;
+                    }
+                    else
+                    {
+                        cube.BlockType = ArmorCube.Type.Block;
+                    }
+                }
                 else if (count == 4)
                 {
                     cube.BlockType = ArmorCube.Type.InvCorner;
@@ -422,14 +485,7 @@ namespace Stl2Blueprint
                     }
                 }
             }
-
-            // TODO: Check all the points to determine appropriate slope vs full block
-
-            string s = cube.ToString();
-            lock (text)
-                text.Write(s);
-            lock (blockCount)
-                blockCount.Value++;
+            return true;
         }
 
         private bool FileReady ()
@@ -460,20 +516,23 @@ namespace Stl2Blueprint
         {
             if(fileDialog.ShowDialog() == DialogResult.OK)
             {
-                lblFile.Text = fileDialog.SafeFileName;
-                txtBlueprintName.ForeColor = Color.Black;
-                txtBlueprintName.Text = Path.GetFileNameWithoutExtension(fileDialog.SafeFileName);
                 m = Mesh.ParseStl(fileDialog.FileName);
-                lblTris.Text = $"Triangles: {m.Triangles.Length} Edges: {m.Edges.Length} Verticies: {m.Verticies.Length}";
-                if(!txtSizeX.Enabled)
+                if (m.Triangles.Length > 0)
                 {
-                    txtSizeX.Enabled = true;
-                    txtSizeY.Enabled = true;
-                    txtSizeZ.Enabled = true;
-                    txtResolution.Enabled = true;
-                    txtSizeX.Text = "100";
+                    lblFile.Text = fileDialog.SafeFileName;
+                    txtBlueprintName.ForeColor = Color.Black;
+                    txtBlueprintName.Text = Path.GetFileNameWithoutExtension(fileDialog.SafeFileName);
+                    lblTris.Text = $"Triangles: {m.Triangles.Length} Edges: {m.Edges.Length} Verticies: {m.Verticies.Length}";
+                    if (!txtSizeX.Enabled)
+                    {
+                        txtSizeX.Enabled = true;
+                        txtSizeY.Enabled = true;
+                        txtSizeZ.Enabled = true;
+                        txtResolution.Enabled = true;
+                        txtSizeX.Text = "100";
+                    }
+                    OnSizeXChanged(null, null);
                 }
-                OnSizeXChanged(null, null);
             }
         }
 

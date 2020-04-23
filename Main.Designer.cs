@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent ()
         {
+            this.components = new System.ComponentModel.Container();
             this.btnOpenFile = new System.Windows.Forms.Button();
             this.fileDialog = new System.Windows.Forms.OpenFileDialog();
             this.progressBar = new System.Windows.Forms.ProgressBar();
@@ -58,6 +59,8 @@
             this.chkHollow = new System.Windows.Forms.CheckBox();
             this.chkSlopes = new System.Windows.Forms.CheckBox();
             this.lblSizeMeters = new System.Windows.Forms.Label();
+            this.chkAccuracy = new System.Windows.Forms.CheckBox();
+            this.toolTip = new System.Windows.Forms.ToolTip(this.components);
             this.SuspendLayout();
             // 
             // btnOpenFile
@@ -144,6 +147,7 @@
             this.txtSizeX.Name = "txtSizeX";
             this.txtSizeX.Size = new System.Drawing.Size(100, 20);
             this.txtSizeX.TabIndex = 12;
+            this.toolTip.SetToolTip(this.txtSizeX, "Size of the model x-axis in blocks.");
             this.txtSizeX.TextChanged += new System.EventHandler(this.OnSizeXChanged);
             this.txtSizeX.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.DigitKeyFilter);
             // 
@@ -155,6 +159,7 @@
             this.txtSizeY.Name = "txtSizeY";
             this.txtSizeY.Size = new System.Drawing.Size(100, 20);
             this.txtSizeY.TabIndex = 13;
+            this.toolTip.SetToolTip(this.txtSizeY, "Size of the model y-axis in blocks.");
             this.txtSizeY.TextChanged += new System.EventHandler(this.OnSizeYChanged);
             this.txtSizeY.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.DigitKeyFilter);
             // 
@@ -166,6 +171,7 @@
             this.txtSizeZ.Name = "txtSizeZ";
             this.txtSizeZ.Size = new System.Drawing.Size(100, 20);
             this.txtSizeZ.TabIndex = 14;
+            this.toolTip.SetToolTip(this.txtSizeZ, "Size of the model z-axis in blocks.");
             this.txtSizeZ.TextChanged += new System.EventHandler(this.OnSizeZChanged);
             this.txtSizeZ.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.DigitKeyFilter);
             // 
@@ -312,6 +318,7 @@
             this.chkHollow.Size = new System.Drawing.Size(58, 17);
             this.chkHollow.TabIndex = 26;
             this.chkHollow.Text = "Hollow";
+            this.toolTip.SetToolTip(this.chkHollow, "Makes the blueprint hollow.");
             this.chkHollow.UseVisualStyleBackColor = true;
             this.chkHollow.CheckedChanged += new System.EventHandler(this.OnHollowChanged);
             // 
@@ -323,6 +330,7 @@
             this.chkSlopes.Size = new System.Drawing.Size(58, 17);
             this.chkSlopes.TabIndex = 27;
             this.chkSlopes.Text = "Slopes";
+            this.toolTip.SetToolTip(this.chkSlopes, "Adds slopes to the blueprint.\r\nThis feature is not yet finished.");
             this.chkSlopes.UseVisualStyleBackColor = true;
             this.chkSlopes.CheckedChanged += new System.EventHandler(this.OnUseSlopesChanged);
             // 
@@ -334,11 +342,23 @@
             this.lblSizeMeters.Size = new System.Drawing.Size(0, 13);
             this.lblSizeMeters.TabIndex = 29;
             // 
+            // chkAccuracy
+            // 
+            this.chkAccuracy.AutoSize = true;
+            this.chkAccuracy.Location = new System.Drawing.Point(145, 367);
+            this.chkAccuracy.Name = "chkAccuracy";
+            this.chkAccuracy.Size = new System.Drawing.Size(96, 17);
+            this.chkAccuracy.TabIndex = 30;
+            this.chkAccuracy.Text = "Less Accuracy";
+            this.toolTip.SetToolTip(this.chkAccuracy, "Speeds up processing time at the cost of less accurate blueprints.");
+            this.chkAccuracy.UseVisualStyleBackColor = true;
+            // 
             // Main
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.chkAccuracy);
             this.Controls.Add(this.lblSizeMeters);
             this.Controls.Add(this.chkSlopes);
             this.Controls.Add(this.chkHollow);
@@ -405,6 +425,8 @@
         private System.Windows.Forms.CheckBox chkHollow;
         private System.Windows.Forms.CheckBox chkSlopes;
         private System.Windows.Forms.Label lblSizeMeters;
+        private System.Windows.Forms.CheckBox chkAccuracy;
+        private System.Windows.Forms.ToolTip toolTip;
     }
 }
 
