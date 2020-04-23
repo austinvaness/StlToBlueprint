@@ -49,6 +49,7 @@
     <Compile Include="ArmorCube.cs" />
     <Compile Include="BitArray.cs" />
     <Compile Include="BoundingBox.cs" />
+    <Compile Include="PartitionTree.cs" />
     <Compile Include="Line.cs" />
     <Compile Include="Main.cs">
       <SubType>Form</SubType>

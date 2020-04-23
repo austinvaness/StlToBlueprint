@@ -14,10 +14,18 @@ namespace Stl2Blueprint
         public Vector3 extents;
         public Vector3 size;
 
-        public BoundingBox (Vector3 min, Vector3 max)
+        public BoundingBox(Vector3 min, Vector3 max)
         {
             this.min = min;
             this.max = max;
+            size = max - min;
+            center = (max + min) / 2;
+            extents = max - center;
+        }
+        public BoundingBox(BoundingBox clone)
+        {
+            this.min = clone.min;
+            this.max = clone.max;
             size = max - min;
             center = (max + min) / 2;
             extents = max - center;
@@ -35,6 +43,17 @@ namespace Stl2Blueprint
             return pos.x >= min.x && pos.x <= max.x &&
                 pos.y >= min.y && pos.y <= max.y &&
                 pos.z >= min.z && pos.z <= max.z;
+        }
+
+        public void Extend(BoundingBox other)
+        {
+            this.min.x = Math.Min(this.min.x, other.min.x);
+            this.min.y = Math.Min(this.min.y, other.min.y);
+            this.min.z = Math.Min(this.min.z, other.min.z);
+
+            this.max.x = Math.Max(this.max.x, other.max.x);
+            this.max.y = Math.Max(this.max.y, other.max.y);
+            this.max.z = Math.Max(this.max.z, other.max.z);
         }
     }
 }

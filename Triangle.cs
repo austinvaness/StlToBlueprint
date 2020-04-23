@@ -18,7 +18,7 @@ namespace Stl2Blueprint
         public readonly Line edge31;
         public readonly Line edge13;
         public readonly Line edge23;
-        public readonly BoundingBox aabb;
+        public BoundingBox BoundingBox { get; }
         public bool Invalid;
         
         private readonly float planeOffset;
@@ -33,7 +33,7 @@ namespace Stl2Blueprint
             edge31 = new Line(vertex3, vertex1);
             edge13 = new Line(vertex1, vertex3);
             edge23 = new Line(vertex2, vertex3);
-            aabb = new BoundingBox(Vector3.Min(vertex1, vertex2, vertex3), Vector3.Max(vertex1, vertex2, vertex3));
+            BoundingBox = new BoundingBox(Vector3.Min(vertex1, vertex2, vertex3), Vector3.Max(vertex1, vertex2, vertex3));
 
             if (normal == Vector3.Zero)
                 normal = edge12.Dir.Cross(edge13.Dir);
@@ -153,7 +153,7 @@ namespace Stl2Blueprint
         // https://fileadmin.cs.lth.se/cs/Personal/Tomas_Akenine-Moller/pubs/tribox.pdf
         public bool IntersectsBox(BoundingBox box)
         {
-            if (!aabb.Intersects(box))
+            if (!BoundingBox.Intersects(box))
                 return false;
 
             // Plane - AABB intersection
