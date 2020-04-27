@@ -78,9 +78,12 @@ namespace Stl2Blueprint
             lblInfo.Text = "";
             output = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
             string se = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)
-                + "\\SpaceEngineers\\Blueprints\\local";
+                + "\\SpaceEngineers";
             if(Directory.Exists(se))
-                output = se;
+            {
+                output = se + "\\Blueprints\\local";
+                Directory.CreateDirectory(output);
+            }
             folderDialog.SelectedPath = output;
             lblOutput.Text = output;
             comboType.SelectedIndex = 0;
