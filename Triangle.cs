@@ -128,7 +128,7 @@ namespace Stl2Blueprint
         /// </summary>
         /// <param name="point"></param>
         /// <returns></returns>
-        public bool IntersectsPoint(Vector3 point)
+        public bool IntersectsPointX(Vector3 point)
         {
             Vector3 edge1 = edge12.Vector;
             Vector3 edge2 = edge13.Vector;

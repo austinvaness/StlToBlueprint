@@ -45,15 +45,29 @@ namespace Stl2Blueprint
                 pos.z >= min.z && pos.z <= max.z;
         }
 
-        public void Extend(BoundingBox other)
-        {
-            this.min.x = Math.Min(this.min.x, other.min.x);
-            this.min.y = Math.Min(this.min.y, other.min.y);
-            this.min.z = Math.Min(this.min.z, other.min.z);
+        //Commented out for not working (maybe)
+        //public void Extend(BoundingBox other)
+        //{
+        //    this.min.x = Math.Min(this.min.x, other.min.x);
+        //    this.min.y = Math.Min(this.min.y, other.min.y);
+        //    this.min.z = Math.Min(this.min.z, other.min.z);
 
-            this.max.x = Math.Max(this.max.x, other.max.x);
-            this.max.y = Math.Max(this.max.y, other.max.y);
-            this.max.z = Math.Max(this.max.z, other.max.z);
+        //    this.max.x = Math.Max(this.max.x, other.max.x);
+        //    this.max.y = Math.Max(this.max.y, other.max.y);
+        //    this.max.z = Math.Max(this.max.z, other.max.z);
+        //}
+
+        public static BoundingBox Merge(BoundingBox b1, BoundingBox b2)
+        {
+            return new BoundingBox(new Vector3(
+                    Math.Min(b1.min.x, b2.min.x),
+                    Math.Min(b1.min.y, b2.min.y),
+                    Math.Min(b1.min.z, b2.min.z)
+                ), new Vector3(
+                    Math.Max(b1.max.x, b2.max.x),
+                    Math.Max(b1.max.y, b2.max.y),
+                    Math.Max(b1.max.z, b2.max.z)
+                ));
         }
     }
 }

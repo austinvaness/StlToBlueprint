@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -22,7 +23,7 @@ namespace Stl2Blueprint
             Edges = edges.ToArray();
             Verticies = verticies.ToArray();
             Bounds = new BoundingBox(min, max);
-            PartitionTree = new PartitionTree(triangles.ToList(), Bounds);
+            PartitionTree = new PartitionTree(triangles.ToList(), PartitionTree.Axis.Z);
         }
 
         public static Mesh ParseStl(string fileName)
@@ -104,6 +105,11 @@ namespace Stl2Blueprint
             //        count++;
             //}
             //return count % 2 == 1;
+        }
+
+        public Color getColor(Vector3 p)
+        {
+            return PartitionTree.getColor(p);
         }
 
         public bool ContainsBox(BoundingBox box)

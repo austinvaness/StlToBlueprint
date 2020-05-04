@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -94,6 +95,8 @@ namespace Stl2Blueprint
 
         void Process (Mesh m, float c, bool hollow, bool slopes, BackgroundWorker worker, DoWorkEventArgs e)
         {
+            Stopwatch stopWatch = new Stopwatch();
+            stopWatch.Start();
 
             Vector3I size = Vector3.Floor(m.Bounds.size / c) + 1;
             BitArray grid = new BitArray(size.x, size.y, size.z);
@@ -148,6 +151,9 @@ namespace Stl2Blueprint
             text = File.CreateText(tempFile);
             text.Write(header);
 
+            TimeSpan pointsCreatedTimeSpan = stopWatch.Elapsed;
+            stopWatch.Restart();
+
             for (x = 0; x < size.x; x++)
             {
                 if (worker.CancellationPending)
@@ -168,8 +174,20 @@ namespace Stl2Blueprint
                     });
                 }
             }
+            TimeSpan blocksCreatedTimeSpan = stopWatch.Elapsed;
+            stopWatch.Stop();
 
-            worker.ReportProgress(100, "Done! - Blocks: " + blockCount.Value);
+            string pointsCreatedElapsedString = String.Format("    Point cloud took:{0:00}:{1:00}:{2:00}.{3:00}",
+           pointsCreatedTimeSpan.Hours, pointsCreatedTimeSpan.Minutes, pointsCreatedTimeSpan.Seconds,
+           pointsCreatedTimeSpan.Milliseconds / 10);
+            string blocksCreatedElapsedString = String.Format("    Block placement took:{0:00}:{1:00}:{2:00}.{3:00}",
+           blocksCreatedTimeSpan.Hours, blocksCreatedTimeSpan.Minutes, blocksCreatedTimeSpan.Seconds,
+           blocksCreatedTimeSpan.Milliseconds / 10);
+
+            worker.ReportProgress(100, "Done! - Blocks: "
+                + blockCount.Value
+                + pointsCreatedElapsedString
+                + blocksCreatedElapsedString);
 
             text.Write(Main.footer.Replace("{name}", name));
             text.Close();
@@ -245,6 +263,7 @@ namespace Stl2Blueprint
                 count++;
 
             Vector3I gridPos = new Vector3I(x, y, z);
+            Vector3 realPos = (gridPos * c) + m.Bounds.min;
             if (count > 0)
             {
                 if (count == 8 && hollow)
@@ -252,13 +271,14 @@ namespace Stl2Blueprint
             }
             else
             {
-                Vector3 realPos = (gridPos * c) + m.Bounds.min;
+                
                 if (!m.ContainsBox(new BoundingBox(realPos, realPos + c)))
                     return;
                 count = 8;
             }
 
             ArmorCube cube = new ArmorCube(this.cube, gridPos);
+            //cube.BlockColor = m.getColor(realPos + c);
             if (slopes)
             {
                 if (count == 1)
