@@ -49,6 +49,7 @@
     <Compile Include="ArmorCube.cs" />
     <Compile Include="BitArray.cs" />
     <Compile Include="BoundingBox.cs" />
+    <Compile Include="ChunkMesh.cs" />
     <Compile Include="GlobalConstants.cs" />
     <Compile Include="Line.cs" />
     <Compile Include="Main.cs">
@@ -59,6 +60,7 @@
     </Compile>
     <Compile Include="Matrix.cs" />
     <Compile Include="Mesh.cs" />
+    <Compile Include="StandardMesh.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Triangle.cs" />
@@ -66,6 +68,7 @@
     <Compile Include="Vector3I.cs" />
     <EmbeddedResource Include="Main.resx">
       <DependentUpon>Main.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

@@ -1,11 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.Globalization;
-using System.Linq;
-using System.Security.Cryptography.X509Certificates;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace Stl2Blueprint
 {
@@ -18,6 +13,12 @@ namespace Stl2Blueprint
             x = xyz;
             y = xyz;
             z = xyz;
+        }
+        public Vector3(Vector3I intVector)
+        {
+            x = intVector.x;
+            y = intVector.y;
+            z = intVector.z;
         }
 
         public Vector3(float x, float y, float z)
@@ -65,6 +66,10 @@ namespace Stl2Blueprint
         {
             return new Vector3(v.x * n, v.y * n, v.z * n);
         }
+        public static Vector3 operator * (Vector3 v, Vector3 v2)
+        {
+            return new Vector3(v.x * v2.x, v.y * v2.y, v.z * v2.z);
+        }
 
         public static Vector3 operator - (Vector3 v)
         {
@@ -74,6 +79,11 @@ namespace Stl2Blueprint
         public static Vector3 operator / (Vector3 v, float n)
         {
             return new Vector3(v.x / n, v.y / n, v.z / n);
+        }
+
+        public static Vector3 operator / (Vector3 v, Vector3 v2)
+        {
+            return new Vector3(v.x / v2.x, v.y / v2.y, v.z / v2.z);
         }
 
         public static Vector3 operator - (Vector3 v1, Vector3 v2)
