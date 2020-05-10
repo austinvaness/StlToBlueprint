@@ -119,11 +119,11 @@ namespace Stl2Blueprint
         {
             Vector3I min = boundingChunk(box.min);
             Vector3I max = boundingChunk(box.max);
-            for (int x = min.x; x < max.x; x++)
+            for (int x = min.x; x <= Math.Min(max.x, size.x - 1); x++)
             {
-                for (int y = min.y; y < max.y; y++)
+                for (int y = min.y; y <= Math.Min(max.y, size.y - 1); y++)
                 {
-                    for (int z = min.z; z < max.z; z++)
+                    for (int z = min.z; z <= Math.Min(max.z, size.z - 1); z++)
                     {
                         Chunk chunk = chunks[getIndex(x, y, z)];
                         if (chunk.IntersectsBox(box))
