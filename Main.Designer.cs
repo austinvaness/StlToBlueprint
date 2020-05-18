@@ -367,7 +367,7 @@
             this.toolTip.SetToolTip(this.chkChunkMesh, "Significantly faster, but may generate \'spurs\' of unwanted blocks in very large a" +
         "nd complex models");
             this.chkChunkMesh.UseVisualStyleBackColor = true;
-            this.chkChunkMesh.CheckedChanged += new System.EventHandler(this.chkChunkMesh_CheckedChanged);
+            this.chkChunkMesh.CheckedChanged += new System.EventHandler(this.ChkChunkMesh_CheckedChanged);
             // 
             // Main
             // 

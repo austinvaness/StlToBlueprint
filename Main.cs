@@ -764,7 +764,7 @@ namespace Stl2Blueprint
             slopes = chkSlopes.Checked;
         }
 
-        private void chkChunkMesh_CheckedChanged(object sender, EventArgs e)
+        private void ChkChunkMesh_CheckedChanged(object sender, EventArgs e)
         {
             chunkedProcessing = chkChunkMesh.Checked;
         }

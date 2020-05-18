@@ -11,9 +11,9 @@ namespace Stl2Blueprint
             public BoundingBox boundingBox;
             public List<Triangle> triangles;
 
-            override public String ToString()
+            override public string ToString ()
             {
-                return String.Format("P{0},{1},{2}, T:{3}, Bmin:{4}, Bmax:{5}",
+                return string.Format("P{0},{1},{2}, T:{3}, Bmin:{4}, Bmax:{5}",
                     position.x, position.y, position.z,
                     (triangles == null ? "null" : triangles.Count.ToString()),
                     boundingBox.min, boundingBox.max);
@@ -49,20 +49,20 @@ namespace Stl2Blueprint
             }
         }
 
-        public Vector3I size { get; }
-        public Vector3 offset { get; }
-        public Vector3 chunkSize { get; }
-        public Chunk[] chunks { get; }
+        public Vector3I Size { get; }
+        public Vector3 Offset { get; }
+        public Vector3 ChunkSize { get; }
+        public Chunk[] Chunks { get; }
         public BoundingBox Bounds { get; }
 
         public ChunkMesh(StandardMesh mesh, Vector3I size, BoundingBox boundingBox)
         {
             Triangle[] Triangles = mesh.Triangles;
             Bounds = mesh.Bounds;
-            offset = boundingBox.min;
-            this.size = size;
-            chunkSize = boundingBox.size / size;
-            chunks = new Chunk[size.x * size.y * size.z];
+            Offset = boundingBox.min;
+            this.Size = size;
+            ChunkSize = boundingBox.size / size;
+            Chunks = new Chunk[size.x * size.y * size.z];
             for (int x = 0; x < size.x; x++)
             {
                 for (int y = 0; y < size.y; y++)
@@ -70,11 +70,11 @@ namespace Stl2Blueprint
                     for (int z = 0; z < size.z; z++)
                     {
                         Vector3I pos = new Vector3I(x, y, z);
-                        int i = getIndex(pos);
-                        chunks[i].position = pos;
-                        chunks[i].boundingBox = new BoundingBox(
-                            (pos * chunkSize) + offset,
-                            (pos * chunkSize) + offset + chunkSize
+                        int i = GetIndex(pos);
+                        Chunks[i].position = pos;
+                        Chunks[i].boundingBox = new BoundingBox(
+                            (pos * ChunkSize) + Offset,
+                            (pos * ChunkSize) + Offset + ChunkSize
                         );
                     }
                 }
@@ -82,15 +82,15 @@ namespace Stl2Blueprint
             for (int t = 0; t < Triangles.Length; t++)
             {
                 Triangle triangle = Triangles[t];
-                Vector3I min = boundingChunk(Vector3.Min(triangle.vertex1, triangle.vertex2, triangle.vertex3));
-                Vector3I max = boundingChunk(Vector3.Max(triangle.vertex1, triangle.vertex2, triangle.vertex3));
+                Vector3I min = BoundingChunk(Vector3.Min(triangle.vertex1, triangle.vertex2, triangle.vertex3));
+                Vector3I max = BoundingChunk(Vector3.Max(triangle.vertex1, triangle.vertex2, triangle.vertex3));
                 for (int x = min.x; x <= Math.Min(max.x, size.x - 1); x++)
                 {
                     for (int y = min.y; y <= Math.Min(max.y, size.y - 1); y++)
                     {
                         for (int z = min.z; z <= Math.Min(max.z, size.z - 1); z++)
                         {
-                            Chunk chunk = chunks[getIndex(x, y, z)];
+                            Chunk chunk = Chunks[GetIndex(x, y, z)];
                             if (triangle.IntersectsBox(chunk.boundingBox))
                             {
                                 if (chunk.triangles == null)
@@ -98,7 +98,7 @@ namespace Stl2Blueprint
                                     chunk.triangles = new List<Triangle>();
                                 }
                                 chunk.triangles.Add(triangle);
-                                chunks[getIndex(x, y, z)] = chunk;
+                                Chunks[GetIndex(x, y, z)] = chunk;
                             }
                         }
                     }
@@ -109,23 +109,23 @@ namespace Stl2Blueprint
         public bool ContainsPoint(Vector3 p)
         {
             int count;
-            Vector3I chunkPos = boundingChunk(p);
-            Chunk chunk = chunks[getIndex(0, chunkPos.y, chunkPos.z)];
+            Vector3I chunkPos = BoundingChunk(p);
+            Chunk chunk = Chunks[GetIndex(0, chunkPos.y, chunkPos.z)];
             count = chunk.IntersectionCount(p);
             return count % 2 == 1;
         }
 
         public bool IntersectsBox(BoundingBox box)
         {
-            Vector3I min = boundingChunk(box.min);
-            Vector3I max = boundingChunk(box.max);
-            for (int x = min.x; x <= Math.Min(max.x, size.x - 1); x++)
+            Vector3I min = BoundingChunk(box.min);
+            Vector3I max = BoundingChunk(box.max);
+            for (int x = min.x; x <= Math.Min(max.x, Size.x - 1); x++)
             {
-                for (int y = min.y; y <= Math.Min(max.y, size.y - 1); y++)
+                for (int y = min.y; y <= Math.Min(max.y, Size.y - 1); y++)
                 {
-                    for (int z = min.z; z <= Math.Min(max.z, size.z - 1); z++)
+                    for (int z = min.z; z <= Math.Min(max.z, Size.z - 1); z++)
                     {
-                        Chunk chunk = chunks[getIndex(x, y, z)];
+                        Chunk chunk = Chunks[GetIndex(x, y, z)];
                         if (chunk.IntersectsBox(box))
                         {
                             return true;
@@ -136,20 +136,20 @@ namespace Stl2Blueprint
             return false;
         }
 
-        private int getIndex(Vector3I position)
+        private int GetIndex(Vector3I position)
         {
-            return getIndex(position.x, position.y, position.z);
+            return GetIndex(position.x, position.y, position.z);
         }
-        private int getIndex(int x, int y, int z)
+        private int GetIndex(int x, int y, int z)
         {
-            return x + y * size.x + z * size.x * size.y;
+            return x + y * Size.x + z * Size.x * Size.y;
         }
-        public Vector3I boundingChunk(Vector3 position)
+        public Vector3I BoundingChunk(Vector3 position)
         {
             return new Vector3I(
-                (int)Math.Floor((position.x - offset.x) / chunkSize.x),
-                (int)Math.Floor((position.y - offset.y) / chunkSize.y),
-                (int)Math.Floor((position.z - offset.z) / chunkSize.z)
+                (int)Math.Floor((position.x - Offset.x) / ChunkSize.x),
+                (int)Math.Floor((position.y - Offset.y) / ChunkSize.y),
+                (int)Math.Floor((position.z - Offset.z) / ChunkSize.z)
             );
         }
     }
