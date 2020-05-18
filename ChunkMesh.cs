@@ -61,7 +61,7 @@ namespace Stl2Blueprint
             Bounds = mesh.Bounds;
             offset = boundingBox.min;
             this.size = size;
-            chunkSize = boundingBox.size / new Vector3(size);
+            chunkSize = boundingBox.size / size;
             chunks = new Chunk[size.x * size.y * size.z];
             for (int x = 0; x < size.x; x++)
             {
@@ -73,8 +73,8 @@ namespace Stl2Blueprint
                         int i = getIndex(pos);
                         chunks[i].position = pos;
                         chunks[i].boundingBox = new BoundingBox(
-                            (new Vector3(pos) * chunkSize) + offset,
-                            (new Vector3(pos) * chunkSize) + offset + chunkSize
+                            (pos * chunkSize) + offset,
+                            (pos * chunkSize) + offset + chunkSize
                         );
                     }
                 }

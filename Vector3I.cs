@@ -53,5 +53,10 @@ namespace Stl2Blueprint
         {
             return new Vector3(v.x / n, v.y / n, v.z / n);
         }
+
+        public static explicit operator Vector3I(Vector3 other)
+        {
+            return new Vector3I((int)other.x, (int)other.y, (int)other.z);
+        }
     }
 }

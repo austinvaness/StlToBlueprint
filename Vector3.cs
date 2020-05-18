@@ -14,12 +14,6 @@ namespace Stl2Blueprint
             y = xyz;
             z = xyz;
         }
-        public Vector3(Vector3I intVector)
-        {
-            x = intVector.x;
-            y = intVector.y;
-            z = intVector.z;
-        }
 
         public Vector3(float x, float y, float z)
         {
@@ -210,10 +204,15 @@ namespace Stl2Blueprint
             return sb.ToString();
         }
 
-        public static Vector3 Zero = new Vector3();
-        public static Vector3 AxisX = new Vector3(1, 0, 0);
-        public static Vector3 AxisY = new Vector3(0, 1, 0);
-        public static Vector3 AxisZ = new Vector3(0, 0, 1);
+        public static implicit operator Vector3 (Vector3I other)
+        {
+            return new Vector3(other.x, other.y, other.z);
+        }
+
+        public static readonly Vector3 Zero = new Vector3();
+        public static readonly Vector3 AxisX = new Vector3(1, 0, 0);
+        public static readonly Vector3 AxisY = new Vector3(0, 1, 0);
+        public static readonly Vector3 AxisZ = new Vector3(0, 0, 1);
 
     }
 }
