@@ -61,6 +61,7 @@
             this.lblSizeMeters = new System.Windows.Forms.Label();
             this.chkAccuracy = new System.Windows.Forms.CheckBox();
             this.toolTip = new System.Windows.Forms.ToolTip(this.components);
+            this.chkChunkMesh = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // btnOpenFile
@@ -353,11 +354,27 @@
             this.toolTip.SetToolTip(this.chkAccuracy, "Speeds up processing time at the cost of less accurate blueprints.");
             this.chkAccuracy.UseVisualStyleBackColor = true;
             // 
+            // chkChunkMesh
+            // 
+            this.chkChunkMesh.AutoSize = true;
+            this.chkChunkMesh.Checked = true;
+            this.chkChunkMesh.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chkChunkMesh.Location = new System.Drawing.Point(247, 367);
+            this.chkChunkMesh.Name = "chkChunkMesh";
+            this.chkChunkMesh.Size = new System.Drawing.Size(124, 17);
+            this.chkChunkMesh.TabIndex = 32;
+            this.chkChunkMesh.Text = "Chunked Processing";
+            this.toolTip.SetToolTip(this.chkChunkMesh, "Significantly faster, but may generate \'spurs\' of unwanted blocks in very large a" +
+        "nd complex models");
+            this.chkChunkMesh.UseVisualStyleBackColor = true;
+            this.chkChunkMesh.CheckedChanged += new System.EventHandler(this.chkChunkMesh_CheckedChanged);
+            // 
             // Main
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.chkChunkMesh);
             this.Controls.Add(this.chkAccuracy);
             this.Controls.Add(this.lblSizeMeters);
             this.Controls.Add(this.chkSlopes);
@@ -427,6 +444,7 @@
         private System.Windows.Forms.Label lblSizeMeters;
         private System.Windows.Forms.CheckBox chkAccuracy;
         private System.Windows.Forms.ToolTip toolTip;
+        private System.Windows.Forms.CheckBox chkChunkMesh;
     }
 }
 

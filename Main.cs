@@ -1,12 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
 using System.Drawing;
 using System.IO;
-using System.Linq;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -58,12 +54,13 @@ namespace Stl2Blueprint
         private readonly ArmorCube cube = new ArmorCube();
         private StreamWriter text;
         private float res = 0.01f;
-        private Mesh m;
+        private StandardMesh m;
         private readonly Counter blockCount = new Counter();
         private string output;
         private bool hollow;
         private bool slopes;
         private bool lessAccuracy;
+        private bool chunkedProcessing;
         private readonly Random rand = new Random();
 
         public Main ()
@@ -95,9 +92,10 @@ namespace Stl2Blueprint
             hollow = chkHollow.Checked;
             slopes = chkSlopes.Checked;
             lessAccuracy = chkAccuracy.Checked;
+            chunkedProcessing = chkChunkMesh.Checked;
         }
 
-        void Process (Mesh m, float c, bool hollow, bool slopes, BackgroundWorker worker, DoWorkEventArgs e)
+        void Process (Mesh m, float c, bool hollow, bool slopes, bool chunkedProcessing, BackgroundWorker worker, DoWorkEventArgs e)
         {
 
             Vector3I size = Vector3.Floor(m.Bounds.size / c) + 1;
@@ -107,6 +105,13 @@ namespace Stl2Blueprint
             {
                 e.Cancel = true;
                 return;
+            }
+
+            if (chunkedProcessing)
+            {
+                worker.ReportProgress(0, $"Generating MetaGrid... {0}%");
+                m = new ChunkMesh(((StandardMesh)m), new Vector3I(1, size.y, size.z),
+                                    m.Bounds);
             }
 
             Vector3 min = m.Bounds.min;
@@ -198,7 +203,7 @@ namespace Stl2Blueprint
         private void Write (BitArray grid, Vector3I gridPos, int z, float c, bool hollow, bool slopes, Mesh m)
         {
             gridPos.z = z;
-            if (CheckSlopes(gridPos, c,hollow, slopes, grid, out ArmorCube cube))
+            if (CheckSlopes(gridPos, c,hollow, slopes, grid, out ArmorCube cube, m))
             {
                 string s = cube.ToString();
                 lock (text)
@@ -208,7 +213,7 @@ namespace Stl2Blueprint
             }
         }
 
-        private bool CheckSlopes(Vector3I gridPos, float c, bool hollow, bool slopes, BitArray grid, out ArmorCube cube)
+        private bool CheckSlopes(Vector3I gridPos, float c, bool hollow, bool slopes, BitArray grid, out ArmorCube cube, Mesh m)
         {
             cube = null;
 
@@ -519,7 +524,7 @@ namespace Stl2Blueprint
         {
             if(fileDialog.ShowDialog() == DialogResult.OK)
             {
-                m = Mesh.ParseStl(fileDialog.FileName);
+                m = StandardMesh.ParseStl(fileDialog.FileName);
                 if (m.Triangles.Length > 0)
                 {
                     lblFile.Text = fileDialog.SafeFileName;
@@ -567,7 +572,7 @@ namespace Stl2Blueprint
 
         private void Start (object sender, DoWorkEventArgs e)
         {
-            Process(m, res, hollow, slopes, background, e);
+            Process(m, res, hollow, slopes, chunkedProcessing, background, e);
         }
 
         private void During (object sender, ProgressChangedEventArgs e)
@@ -757,6 +762,11 @@ namespace Stl2Blueprint
         private void OnUseSlopesChanged (object sender, EventArgs e)
         {
             slopes = chkSlopes.Checked;
+        }
+
+        private void chkChunkMesh_CheckedChanged(object sender, EventArgs e)
+        {
+            chunkedProcessing = chkChunkMesh.Checked;
         }
     }
 }
