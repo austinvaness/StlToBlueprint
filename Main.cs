@@ -768,5 +768,10 @@ namespace Stl2Blueprint
         {
             chunkedProcessing = chkChunkMesh.Checked;
         }
+
+        private void chkHeavyArmor_CheckedChanged(object sender, EventArgs e)
+        {
+            cube.Heavy = chkHeavyArmor.Checked;
+        }
     }
 }
