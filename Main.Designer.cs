@@ -120,6 +120,7 @@
             this.txtBlueprintName.Name = "txtBlueprintName";
             this.txtBlueprintName.Size = new System.Drawing.Size(100, 20);
             this.txtBlueprintName.TabIndex = 5;
+            this.toolTip.SetToolTip(this.txtBlueprintName, "Name of the ship.");
             // 
             // btnStart
             // 
@@ -181,9 +182,9 @@
             this.lblSize.AutoSize = true;
             this.lblSize.Location = new System.Drawing.Point(27, 145);
             this.lblSize.Name = "lblSize";
-            this.lblSize.Size = new System.Drawing.Size(57, 13);
+            this.lblSize.Size = new System.Drawing.Size(65, 13);
             this.lblSize.TabIndex = 15;
-            this.lblSize.Text = "Block Size";
+            this.lblSize.Text = "Block Count";
             // 
             // lblInfo
             // 
@@ -265,9 +266,9 @@
             this.lblType.AutoSize = true;
             this.lblType.Location = new System.Drawing.Point(27, 312);
             this.lblType.Name = "lblType";
-            this.lblType.Size = new System.Drawing.Size(31, 13);
+            this.lblType.Size = new System.Drawing.Size(57, 13);
             this.lblType.TabIndex = 23;
-            this.lblType.Text = "Type";
+            this.lblType.Text = "Block Size";
             // 
             // comboSkin
             // 
