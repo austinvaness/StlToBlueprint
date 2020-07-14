@@ -62,6 +62,7 @@
             this.chkAccuracy = new System.Windows.Forms.CheckBox();
             this.toolTip = new System.Windows.Forms.ToolTip(this.components);
             this.chkChunkMesh = new System.Windows.Forms.CheckBox();
+            this.chkHeavyArmor = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // btnOpenFile
@@ -369,11 +370,24 @@
             this.chkChunkMesh.UseVisualStyleBackColor = true;
             this.chkChunkMesh.CheckedChanged += new System.EventHandler(this.ChkChunkMesh_CheckedChanged);
             // 
+            // chkHeavyArmor
+            // 
+            this.chkHeavyArmor.AutoSize = true;
+            this.chkHeavyArmor.Location = new System.Drawing.Point(377, 367);
+            this.chkHeavyArmor.Name = "chkHeavyArmor";
+            this.chkHeavyArmor.Size = new System.Drawing.Size(87, 17);
+            this.chkHeavyArmor.TabIndex = 33;
+            this.chkHeavyArmor.Text = "Heavy Armor";
+            this.toolTip.SetToolTip(this.chkHeavyArmor, "Make the Blueprint out of Heavy Armor Blocks");
+            this.chkHeavyArmor.UseVisualStyleBackColor = true;
+            this.chkHeavyArmor.CheckedChanged += new System.EventHandler(this.chkHeavyArmor_CheckedChanged);
+            // 
             // Main
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.chkHeavyArmor);
             this.Controls.Add(this.chkChunkMesh);
             this.Controls.Add(this.chkAccuracy);
             this.Controls.Add(this.lblSizeMeters);
@@ -445,6 +459,7 @@
         private System.Windows.Forms.CheckBox chkAccuracy;
         private System.Windows.Forms.ToolTip toolTip;
         private System.Windows.Forms.CheckBox chkChunkMesh;
+        private System.Windows.Forms.CheckBox chkHeavyArmor;
     }
 }
 

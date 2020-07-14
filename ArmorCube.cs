@@ -19,15 +19,17 @@ namespace Stl2Blueprint
         {
             BlockSkin = null;
             Large = true;
+            Heavy = false;
             BlockType = Type.Block;
             BlockColor = Color.White;
             BlockPosition = new Vector3I();
         }
 
-        public ArmorCube (string blockSkin, bool large, Type blockType, Color blockColor, Vector3I blockPosition)
+        public ArmorCube (string blockSkin, bool large, bool heavy, Type blockType, Color blockColor, Vector3I blockPosition)
         {
             BlockSkin = blockSkin;
             Large = large;
+            Heavy = heavy;
             BlockType = blockType;
             BlockColor = blockColor;
             BlockPosition = blockPosition;
@@ -38,6 +40,7 @@ namespace Stl2Blueprint
 
             BlockSkin = cube.BlockSkin;
             Large = cube.Large;
+            Heavy = cube.Heavy;
             type = cube.type;
             typeS = cube.typeS;
             color = cube.color;
@@ -51,6 +54,7 @@ namespace Stl2Blueprint
 
             BlockSkin = cube.BlockSkin;
             Large = cube.Large;
+            Heavy = cube.Heavy;
             type = cube.type;
             typeS = cube.typeS;
             color = cube.color;
@@ -61,6 +65,8 @@ namespace Stl2Blueprint
         public string BlockSkin = null;
 
         public bool Large = true;
+
+        public bool Heavy = false;
 
         private Type type;
         private string typeS;
@@ -143,6 +149,10 @@ namespace Stl2Blueprint
                 sb.Append("Large");
             else if(type != Type.HalfSlope && type != Type.Half)
                 sb.Append("Small");
+
+            if (Heavy)
+                sb.Append("Heavy");
+
             sb.Append(typeS).Append("</SubtypeName>\n");
 
             sb.Append(space).Append(posS);
